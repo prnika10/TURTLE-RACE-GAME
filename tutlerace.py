@@ -1,70 +1,62 @@
-from turtle import *
-from random import randint
+from turtle import Turtle, Screen
+from itertools import cycle
+from random import randrange
 
-speed(0)
-penup()
-goto(-140, 140)
+MAX_TURTLES = 20
+LANE_WIDTH = 25
+FONT_SIZE = 18
+FONT = ("Arial", FONT_SIZE, "normal")
+COLORS = cycle(['red', 'green', 'blue', 'cyan', 'black', 'yellow'])
+FINISH_LINE = 350
+START_LINE = -200
+NAME_LINE = START_LINE - 150
+DELAY = 100  # milliseconds
+MAX_STEP = 10
+turtles = dict()
 
-for step in range(15):
-  write(step, align='center')
-  right(90)
-  for num in range(8):
-    penup()
-    forward(10)
-    pendown()
-    forward(10)
-  penup()
-  backward(160)
-  left(90)
-  forward(20)
+def race():
+    for name, turtle in turtles.items():  # should shuffle turtles
+        turtle.forward(randrange(MAX_STEP + 1))
 
-ada = Turtle()
-ada.color('pink')
-ada.shape('turtle')
+        if turtle.xcor() > FINISH_LINE:
+            return  # the race is over
 
-ada.penup()
-ada.goto(-160, 100)
-ada.pendown()
+    screen.ontimer(race, DELAY)
 
-for turn in range(10):
-  ada.right(36)
+magic_marker = Turtle(visible=False)
+magic_marker.penup()
 
-bob = Turtle()
-bob.color('blue')
-bob.shape('turtle')
+turtNum = 0
+while not 1 <= turtNum <= MAX_TURTLES:
+    turtNum = int(input('Enter the number of turtles: '))
 
-bob.penup()
-bob.goto(-160, 70)
-bob.pendown()
+for i in range(turtNum):
 
-for turn in range(72):
-  bob.left(5)
+    name = input('Enter a name for the turtle #{}: '.format(i + 1))
 
-ivy = Turtle()
-ivy.shape('turtle')
-ivy.color('green')
+    turtle = Turtle(shape="turtle")
+    turtle.color(next(COLORS))
 
-ivy.penup()
-ivy.goto(-160, 40)
-ivy.pendown()
+    y_offset = LANE_WIDTH * i - LANE_WIDTH * turtNum // 2
 
-for turn in range(60):
-  ivy.right(6)
+    magic_marker.color(turtle.pencolor())
+    magic_marker.goto(NAME_LINE, y_offset - FONT_SIZE / 2)
+    magic_marker.write(name, font=FONT)
 
-jim = Turtle()
-jim.shape('turtle')
-jim.color('orange')
+    turtle.penup()
+    turtle.goto(START_LINE, y_offset)
+    turtle.pendown()
 
-jim.penup()
-jim.goto(-160, 10)
-jim.pendown()
+    turtles[name] = turtle
 
-for turn in range(30):
-  jim.left(12)
+magic_marker.color('red')
+magic_marker.goto(FINISH_LINE, -FINISH_LINE)
+magic_marker.pendown()
+magic_marker.goto(FINISH_LINE, FINISH_LINE)
+magic_marker.penup()
 
-for turn in range(100):
-  ada.forward(randint(1,5))
-  bob.forward(randint(1,5))
-  ivy.forward(randint(1,5))
-  jim.forward(randint(1,5))
-  
+screen = Screen()
+
+screen.ontimer(race, DELAY)
+
+screen.exitonclick()
